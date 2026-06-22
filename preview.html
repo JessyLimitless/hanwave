@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>팝업 프리뷰</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Serif+KR:wght@500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* 디자인 검토용: 정지 상태로 보기 위해 진입 애니메이션 비활성화 */
+    *, *::before, *::after { animation: none !important; }
+    body {
+      display: block; padding: 32px;
+      background:
+        radial-gradient(900px 500px at 80% -10%, #2a2550, transparent 60%),
+        radial-gradient(800px 500px at 0% 110%, #3a1f3a, transparent 55%),
+        #1b1d33;
+    }
+    .preview-wrap { max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; }
+    .preview-label { color: #cfd2ff; font: 700 0.8rem/1 'Noto Sans KR'; letter-spacing: 1px; margin-bottom: 14px; opacity: 0.8; }
+    .popup { margin: 0 auto; }
+  </style>
+</head>
+<body>
+  <div class="preview-wrap">
+
+    <!-- 1) 퀴즈 -->
+    <div>
+      <div class="preview-label">① 퀴즈 상태</div>
+      <div class="popup">
+        <div class="attack-flash"></div>
+        <div class="popup-head">天地玄黃 · 1 / 4</div>
+        <div class="char-stage"><div class="char-box">天</div></div>
+        <div class="popup-head">이 한자의 뜻과 음은?</div>
+        <div class="options">
+          <button class="option">땅 지</button>
+          <button class="option correct">하늘 천</button>
+          <button class="option">검을 현</button>
+          <button class="option">누를 황</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2) 해설 -->
+    <div>
+      <div class="preview-label">② 해설 / 카드 획득 상태</div>
+      <div class="popup">
+        <div class="lore">
+          <div class="popup-head">✨ 봉인 해제 — 한자의 비밀 ✨</div>
+          <div class="lore-head">
+            <div class="l-char">天</div>
+            <div class="l-read">하늘 천</div>
+          </div>
+          <div class="lore-meta">
+            <span>부수 大</span>
+            <span>총획 4획</span>
+            <button class="btn ghost" style="padding:2px 12px;font-size:0.8rem">🔊 음 듣기</button>
+          </div>
+          <div class="lore-section">
+            <h4>어원 이야기</h4>
+            <p>사람이 팔다리를 벌리고 선 모양(大) 위에, ‘가장 높은 곳’을 뜻하는 한 획을 그어 머리 위의 하늘을 나타냈다.</p>
+          </div>
+          <div class="lore-section">
+            <h4>활용 단어</h4>
+            <ul class="vocab">
+              <li><b>天國 (천국)</b> — <span>하늘나라</span></li>
+              <li><b>天才 (천재)</b> — <span>타고난 뛰어난 재주를 가진 사람</span></li>
+            </ul>
+          </div>
+          <div class="card-earned">🃏 카드 도감에 저장되었습니다! (+10 EXP · +5 Gold)</div>
+          <div class="lore-actions">
+            <button class="btn">다음 한자 ▶</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3) 콤보 -->
+    <div>
+      <div class="preview-label">③ 사자성어 콤보 상태</div>
+      <div class="popup">
+        <div class="combo">
+          <div class="combo-banner">⭐ 사자성어 완성 ⭐</div>
+          <div class="combo-phrase">天地玄黃</div>
+          <div class="combo-trans">"하늘은 검고 땅은 누르다"</div>
+          <div class="card-earned">🏆 완벽 클리어 보너스!</div>
+          <div class="combo-reward">
+            <span>💰 +<b>50</b> Gold</span>
+            <span>✨ +<b>40</b> EXP</span>
+          </div>
+          <div class="lore-actions">
+            <button class="btn">지도로 돌아가기</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

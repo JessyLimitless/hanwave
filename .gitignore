@@ -1,0 +1,12 @@
+# 원본 생성 이미지(중복 — hero.png/hero.webp 사용)
+Gemini_Generated_Image_*.png
+
+# OS / 에디터
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.log
+
+# 임시
+_*.js
+node_modules/
