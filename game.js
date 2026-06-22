@@ -512,7 +512,7 @@ function showQuizForChar(c) {
     </div>
     <div class="popup-head">이 한자의 뜻과 음은?</div>
     <div class="options" id="options">
-      ${options.map((o, k) => `<button class="option" data-opt="${o}" style="animation-delay:${120 + k * 80}ms">${o}</button>`).join('')}
+      ${options.map((o, k) => `<button class="option" data-opt="${o}" style="animation-delay:${120 + k * 80}ms"><span class="opt-num">${k + 1}</span>${o}</button>`).join('')}
     </div>`;
 
   sfx.appear();
@@ -747,6 +747,22 @@ function init() {
     if (e.target.id === 'overlay') {
       // 퀴즈 도중에는 닫지 않음. 결과/콤보 단계에서만 닫기 허용은 버튼으로.
       toast('보기를 선택해 몬스터를 봉인하세요!');
+    }
+  });
+
+  // 키보드 조작: 1~4 보기 선택, Enter 다음 단계로
+  document.addEventListener('keydown', (e) => {
+    const overlay = $('#overlay');
+    if (!overlay || overlay.classList.contains('hidden')) return;
+    if (/^[1-4]$/.test(e.key)) {
+      const opts = $$('#options .option');
+      const idx = Number(e.key) - 1;
+      if (opts[idx] && !opts[idx].disabled) { opts[idx].click(); e.preventDefault(); }
+      return;
+    }
+    if (e.key === 'Enter') {
+      const b = $('#btn-next') || $('#btn-continue') || $('#btn-combo-done');
+      if (b) { b.click(); e.preventDefault(); }
     }
   });
 
