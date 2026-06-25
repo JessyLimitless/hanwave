@@ -214,6 +214,7 @@
     function renderRecite() {
       sfx.drop();
       const say = TTS ? '<button class="say" aria-label="독음 듣기" title="독음 듣기">🔊</button>' : '';
+      const full = c.full || (window.JANGJA_FULL || {})[c.ch];
       const lines = (c.lines || []).map(l =>
         '<div class="line" data-read="' + (l.read || '') + '"><div class="han">' + l.han + '</div><div class="read">' + (l.read || '') + '</div><div class="ko">' + (l.ko || '') + '</div>' + say + '</div>'
       ).join('');
@@ -221,6 +222,10 @@
         '<div class="step"><div class="step-head"><div class="kicker">원문 낭독</div>' +
         '<h3 class="serif">' + c.title + '</h3><div class="ko">' + (c.titleKo || '') + '</div></div>' +
         '<div class="recite">' + lines + '</div>' +
+        (full ? '<details class="fulltext"><summary>📜 원문 전체(全文) 펼쳐 보기' +
+          (full.src ? ' <span class="ft-src">· ' + full.src + '</span>' : '') + '</summary>' +
+          '<div class="ft-body"><div class="ft-han serif">' + full.han + '</div>' +
+          (full.ko ? '<div class="ft-ko">' + full.ko + '</div>' : '') + '</div></details>' : '') +
         '<div class="actions">' +
         (TTS ? '<button class="btn ghost" id="listen">🔊 전체 듣기</button>' : '') +
         '<button class="btn" id="np">소리 내어 읽었어요 →</button></div></div>'

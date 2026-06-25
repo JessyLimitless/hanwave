@@ -1,12 +1,12 @@
 /* =========================================================================
- * 유진이의 한자교실 — 노자 도덕경 81장 게임 엔진
- *  데이터: window.NOJA_DATA (noja-data.js) — 장(章) 객체 배열
- *  루프: 도(道)의 길(81 디딤돌) → 장 클릭 → 낭독 → 빈칸 → 짝맞추기 → 풀이 → 물음 → 도장
+ * 유진이의 한자교실 — 논어(論語) 핵심 명문·일화 49장 게임 엔진
+ *  데이터: window.NONEO_DATA (noneo-data.js) — 7부 구절 객체 배열
+ *  루프: 배움(學)의 길(49 디딤돌) → 장 클릭 → 낭독 → 빈칸 → 짝맞추기 → 풀이 → 물음 → 도장
  * ======================================================================= */
 (function () {
   'use strict';
   const $ = (s, r) => (r || document).querySelector(s);
-  const DATA = Array.isArray(window.NOJA_DATA) ? window.NOJA_DATA.slice().sort((a, b) => a.ch - b.ch) : [];
+  const DATA = Array.isArray(window.NONEO_DATA) ? window.NONEO_DATA.slice().sort((a, b) => a.ch - b.ch) : [];
 
   /* ---------------- 독음(讀音) 맵 ---------------- *
    * 원문 줄(한자1자=한글1음절)에서 글자별 독음을 추출 + 핵심어 + 보충사전 병합.
@@ -20,7 +20,7 @@
       });
       if (d.keyword && d.keyword.han) m[d.keyword.han] = d.keyword.read;
     });
-    const extra = window.NOJA_READ_EXTRA || {};
+    const extra = window.NONEO_READ_EXTRA || {};
     Object.keys(extra).forEach((k) => { if (!m[k]) m[k] = extra[k]; });
     return m;
   })();
@@ -40,7 +40,7 @@
   }
 
   /* ---------------- 진행 저장 ---------------- */
-  const KEY = 'noja_progress_v1';
+  const KEY = 'noneo_progress_v1';
   let progress = load();
   function load() {
     try { return JSON.parse(localStorage.getItem(KEY)) || { cleared: [] }; }
@@ -51,7 +51,7 @@
 
   /* ---------------- 사운드 (Web Audio · 물/먹/종) ---------------- */
   let actx = null, master = null;
-  let muted = localStorage.getItem('noja_muted') === '1';
+  let muted = localStorage.getItem('noneo_muted') === '1';
   function ctx() {
     if (actx) return actx;
     const AC = window.AudioContext || window.webkitAudioContext;
@@ -98,7 +98,7 @@
   const sBtn = $('#sound-toggle');
   function applyMute() { if (sBtn) { sBtn.textContent = muted ? '🔇' : '🔊'; sBtn.setAttribute('aria-pressed', String(muted)); } }
   applyMute();
-  if (sBtn) sBtn.addEventListener('click', () => { muted = !muted; localStorage.setItem('noja_muted', muted ? '1' : '0'); applyMute(); if (!muted) { ctx(); sfx.drop(); } });
+  if (sBtn) sBtn.addEventListener('click', () => { muted = !muted; localStorage.setItem('noneo_muted', muted ? '1' : '0'); applyMute(); if (!muted) { ctx(); sfx.drop(); } });
   let kicked = false;
   function kick() { if (kicked) return; kicked = true; ctx(); sfx.intro(); ['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(e => window.removeEventListener(e, kick)); }
   ['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(e => window.addEventListener(e, kick, { passive: true }));
@@ -113,33 +113,40 @@
 
   /* ---------------- 도(道)의 길 렌더 ---------------- */
   function renderMeter() {
-    const total = DATA.length || 81, done = progress.cleared.length;
+    const total = DATA.length || 49, done = progress.cleared.length;
     const f = $('#dao-fill'); if (f) f.style.width = (total ? (done / total * 100) : 0) + '%';
-    const l = $('#dao-lab'); if (l) l.innerHTML = '<span>도(道)의 길</span><span><b>' + done + '</b> / ' + total + ' 장</span>';
+    const l = $('#dao-lab'); if (l) l.innerHTML = '<span>배움(學)의 길</span><span><b>' + done + '</b> / ' + total + ' 장</span>';
     const p = $('#prog-count'); if (p) p.innerHTML = '도장 <b>' + done + '</b> / ' + total;
     const firstUn = DATA.find((d) => !isCleared(d.ch));
     const rb = $('#btn-resume');
     if (rb) {
       if (firstUn) { rb.textContent = '▶ 제 ' + firstUn.ch + '장 이어서 풀기'; rb.dataset.ch = firstUn.ch; rb.disabled = false; }
-      else { rb.textContent = '✓ 81장 모두 완독'; rb.disabled = true; }
+      else { rb.textContent = '✓ 49장 모두 통과'; rb.disabled = true; }
     }
     const cb = $('#complete-banner'); if (cb) cb.classList.toggle('hidden', done < total);
   }
   function renderPath() {
     const host = $('#stones'); if (!host) return;
-    if (!DATA.length) { host.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:var(--text-soft); padding:40px">노자 데이터를 불러오지 못했어요. (noja-data.js)</p>'; return; }
+    if (!DATA.length) { host.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:var(--text-soft); padding:40px">논어 데이터를 불러오지 못했어요. (noneo-data.js)</p>'; return; }
     host.innerHTML = '';
+    const SECTION_LBL = {
+      '학이': '學而 <small>학이 · 배움의 기쁨</small>',
+      '위정': '為政 <small>위정 · 덕으로 다스리기</small>',
+      '이인': '里仁·八佾 <small>이인·팔일 · 인과 예</small>',
+      '옹야': '雍也·公冶長·述而 <small>옹야·공야장·술이 · 사람됨</small>',
+      '자한': '子罕·泰伯·顏淵 <small>자한·태백·안연 · 군자의 뜻</small>',
+      '자로': '子路·憲問·衛靈公 <small>자로·헌문·위령공 · 군자의 도</small>',
+      '계씨': '季氏·陽貨·子張·堯曰 <small>계씨·양화·자장·요왈 · 말과 마무리</small>'
+    };
     let lastSection = null;
     DATA.forEach((c) => {
-      const sec = c.ch <= 37 ? 'dao' : 'de';
+      const sec = c.sec || '양혜왕';
       if (sec !== lastSection) {
         lastSection = sec;
         const dv = document.createElement('div');
         dv.className = 'path-divider';
         dv.innerHTML = '<span class="ln"></span><span class="lbl">' +
-          (sec === 'dao'
-            ? '上篇 · 道經 <small>도경 · 제1~37장</small>'
-            : '下篇 · 德經 <small>덕경 · 제38~81장</small>') +
+          (SECTION_LBL[sec] || sec) +
           '</span><span class="ln"></span>';
         host.appendChild(dv);
       }
@@ -192,7 +199,7 @@
     }
     function frame(inner) {
       popup.innerHTML =
-        '<div class="ph-top"><span class="ch-tag">老子 · 제 ' + c.ch + ' 장</span>' +
+        '<div class="ph-top"><span class="ch-tag">論語 · ' + (c.src ? c.src + ' · ' : '') + '제 ' + c.ch + ' 장</span>' +
         '<button class="x" aria-label="닫기">✕</button></div>' + dots() + inner;
       const x = $('.x', popup); if (x) x.addEventListener('click', closePopup);
     }
@@ -211,7 +218,7 @@
     function renderRecite() {
       sfx.drop();
       const say = TTS ? '<button class="say" aria-label="독음 듣기" title="독음 듣기">🔊</button>' : '';
-      const full = c.full || (window.NOJA_FULL || {})[c.ch];
+      const full = c.full || (window.NONEO_FULL || {})[c.ch];
       const lines = (c.lines || []).map(l =>
         '<div class="line" data-read="' + (l.read || '') + '"><div class="han">' + l.han + '</div><div class="read">' + (l.read || '') + '</div><div class="ko">' + (l.ko || '') + '</div>' + say + '</div>'
       ).join('');
@@ -312,6 +319,7 @@
         '<div class="step"><div class="step-head"><div class="kicker">유진이의 풀이</div>' +
         '<h3>이 장은 무슨 뜻일까?</h3></div>' +
         '<div class="yujin"><div class="who">🌸 유진이의 풀이</div>' + (c.yujin || '') + '</div>' +
+        (c.deep ? '<div class="deep"><div class="who">🔎 더 깊이 알기</div>' + c.deep + '</div>' : '') +
         '<div class="actions"><button class="btn" id="np">알겠어요 →</button></div></div>'
       );
       $('#np', popup).addEventListener('click', () => { sfx.brush(); next(); });
@@ -339,10 +347,10 @@
         '<p class="r-title serif">' + c.title + '</p>' +
         '<p class="r-read">' + readOf(c.title) + '</p>' +
         '<p class="r-ko">' + (c.titleKo || '') + '</p>' +
-        '<p style="margin-top:10px; color:var(--teal); font-weight:800">도(道)의 길 ' + progress.cleared.length + ' / ' + (DATA.length || 81) + ' 장</p>' +
+        '<p style="margin-top:10px; color:var(--teal); font-weight:800">배움(學)의 길 ' + progress.cleared.length + ' / ' + (DATA.length || 49) + ' 장</p>' +
         '<div class="actions"><button class="btn ghost" id="again">다시 보기</button><button class="btn" id="done">길로 돌아가기</button></div></div>'
       );
-      $('#done', popup).addEventListener('click', () => { closePopup(); if (!already) toast('도장을 받았어요! 🪷'); });
+      $('#done', popup).addEventListener('click', () => { closePopup(); if (!already) toast('도장을 받았어요! 🌱'); });
       $('#again', popup).addEventListener('click', () => { idx = 0; render(); });
     }
 
@@ -356,7 +364,7 @@
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const layer = document.createElement('div');
     layer.className = 'fx-layer';
-    const petals = ['🌸', '🌼', '❀', '✿', '🍃'];
+    const petals = ['🌱', '🌾', '✿', '🍃', '✦'];
     for (let i = 0; i < 20; i++) {
       const s = document.createElement('span');
       const ink = i % 4 === 0;
@@ -378,7 +386,7 @@
   /* 초기화 버튼 */
   const reset = $('#btn-reset');
   if (reset) reset.addEventListener('click', () => {
-    if (confirm('노자 진행(도장)을 모두 초기화할까요?')) { progress = { cleared: [] }; save(); renderPath(); toast('초기화했어요.'); }
+    if (confirm('논어 진행(도장)을 모두 초기화할까요?')) { progress = { cleared: [] }; save(); renderPath(); toast('초기화했어요.'); }
   });
 
   const resumeBtn = $('#btn-resume');
